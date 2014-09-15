@@ -11,6 +11,7 @@ class Tile
     @neighbor_bomb_count = 0
     @board = board
     @pos = [x, y]
+
   end
 
   def is_bomb?
@@ -28,8 +29,8 @@ class Tile
     [1, 1]
   ]
 
-  def neighbors
-    neighbors = []
+  def get_neighbors
+    @neighbors = []
     NEIGHBOR_POS.each do |(dx, dy)|
       new_pos = [@pos[0] + dx, @pos[1] + dy]
 
@@ -37,7 +38,14 @@ class Tile
         neighbors << @board[new_pos]
       end
     end
-    neighbors
+    nil
+  end
+
+  def get_neighbor_bomb_count
+    get_neighbors
+    @neighbors.each do |neighbor|
+      @neighbor_bomb_count += 1 if neighbor.is_bomb?
+    end
   end
 
   def print_tile
@@ -50,10 +58,6 @@ class Tile
     end
   end
 
-  def get_neighbor_bomb_count
-
-  end
-
 end
 
 class Board
@@ -63,7 +67,8 @@ class Board
 
   def initialize(rows = self.class.blank_grid)
     @rows = rows
-    self.place_bombs
+    place_bombs
+    get_all_neighbor_bomb_count
   end
 
   def place_bombs
@@ -76,6 +81,15 @@ class Board
     all_tiles.sample(10).each do |tile|
       tile.is_bomb = true
     end
+  end
+
+  def get_all_neighbor_bomb_counts
+    @rows.each do |row|
+      row.each do |tile|
+        tile.get_neighbor_bomb_count
+      end
+    end
+    nil
   end
 
   def self.blank_grid
