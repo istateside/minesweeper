@@ -33,7 +33,7 @@ class Tile
     NEIGHBOR_POS.each do |(dx, dy)|
       new_pos = [@pos[0] + dx, @pos[1] + dy]
 
-      if new_pos.all? { |coord| coord.between?(0,7) }
+      if new_pos.all? { |coord| coord.between?(0,8) }
         neighbors << @board[new_pos]
       end
     end
@@ -65,10 +65,14 @@ class Board
 
   attr_reader :rows
 
-  def initialize(rows = self.class.blank_grid)
-    @rows = rows
+  def initialize
+    @rows = nil
+  end
+
+  def prepare_board
+    @rows = blank_grid
     place_bombs
-    get_all_neighbor_bomb_count
+    get_all_neighbor_bomb_counts
   end
 
   def place_bombs
@@ -92,14 +96,20 @@ class Board
     nil
   end
 
-  def self.blank_grid
+  def blank_grid
     grid = Array.new(SIZE) { Array.new(SIZE) }
     grid.each_with_index do |row, row_index|
-      row.each_with_index do |space, col_index|
-        space = Tile.new(self, row_index, col_index)
+      col_index = 0
+      while col_index < row.length
+        row[col_index] = Tile.new(self, row_index, col_index)
+        col_index += 1
       end
+
+      #row.each_with_index do |space, col_index|
+       # space = Tile.new(self, row_index, col_index)
+      #end
     end
-    grid
+    return grid
   end
 
   def [](pos)
@@ -118,7 +128,29 @@ class Board
     nil
   end
 
+  def reveal_spot(pos)
+    if self[pos].nil? || self[pos].revealed
+      return false
+    else
+      self[pos].reveal_tile
+    end
+    true
+  end
+
 end
 
-b = Board.new
-b.display
+class Game
+  def initialize
+    @board = Board.new
+    @board.prepare_board
+  end
+
+  def get_player_choice
+    puts "Select a position. x,y"
+    pos = gets.chomp.split(',')
+    until @board.reveal_spot(pos)
+      puts "Please enter valid coordinates."
+      pos = gets.chomp.split(',')
+    end
+  end
+end
