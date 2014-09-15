@@ -1,23 +1,5 @@
 class Tile
 
-  attr_accessor :is_bomb, :neighbors, :revealed, :is_flagged, :neighbor_bomb_count
-  attr_reader :board, :pos
-
-  def initalize(board, x, y)
-    @is_bomb = false
-    @neighbors = nil
-    @revealed = false
-    @is_flagged = false
-    @neighbor_bomb_count = 0
-    @board = board
-    @pos = [x, y]
-
-  end
-
-  def is_bomb?
-    self.is_bomb
-  end
-
   NEIGHBOR_POS = [
     [-1, -1],
     [-1, 0],
@@ -28,6 +10,23 @@ class Tile
     [1, 0],
     [1, 1]
   ]
+
+  attr_accessor :is_bomb, :neighbors, :revealed, :is_flagged, :neighbor_bomb_count
+  attr_reader :board, :pos
+
+  def initialize(board, x, y)
+    @is_bomb = false
+    @neighbors = nil
+    @revealed = false
+    @is_flagged = false
+    @neighbor_bomb_count = 0
+    @board = board
+    @pos = [x, y]
+  end
+
+  def is_bomb?
+    self.is_bomb
+  end
 
   def get_neighbors
     @neighbors = []
@@ -50,12 +49,13 @@ class Tile
 
   def print_tile
     # return a string depending on the state
+    return 'B' if @is_bomb
     return 'F' if @is_flagged
-    if @revealed
+    # if @revealed
       @neighbor_bomb_count == 0 ? '_' : @neighbor_bomb_count
-    else
-      '*'
-    end
+    # else
+    #   '*'
+    # end
   end
 
 end
@@ -96,7 +96,7 @@ class Board
     grid = Array.new(SIZE) { Array.new(SIZE) }
     grid.each_with_index do |row, row_index|
       row.each_with_index do |space, col_index|
-        space = Tile.new(row_index, col_index)
+        space = Tile.new(self, row_index, col_index)
       end
     end
     grid
@@ -120,3 +120,5 @@ class Board
 
 end
 
+b = Board.new
+b.display
