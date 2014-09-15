@@ -48,11 +48,13 @@ class Board
 
   def display
     @rows.each do |row|
-      row.each do |tile|
-        tile.print_tile + ' '
+      line = []
+      row.map do |tile|
+        line << tile.print_tile
       end
-      puts
+      puts line.join (' ')
     end
+    nil
   end
 
 end
