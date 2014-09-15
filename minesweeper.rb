@@ -51,14 +51,27 @@ class Tile
     # return a string depending on the state
     return 'B' if @is_bomb
     return 'F' if @is_flagged
-    # if @revealed
+    if @revealed
       @neighbor_bomb_count == 0 ? '_' : @neighbor_bomb_count
-    # else
-    #   '*'
-    # end
+    else
+      '*'
+    end
+  end
+
+  def reveal_tile
+    @revealed = true
+
+    if @is_bomb
+      reveal_all_bombs
+      return
+    elsif @neighbor_bomb_count == 0
+      @neighbors.each { |neighbor| neighbor.reveal_tile }
+    end
+    nil
   end
 
 end
+
 
 class Board
   SIZE = 9
@@ -104,10 +117,6 @@ class Board
         row[col_index] = Tile.new(self, row_index, col_index)
         col_index += 1
       end
-
-      #row.each_with_index do |space, col_index|
-       # space = Tile.new(self, row_index, col_index)
-      #end
     end
     return grid
   end
@@ -134,7 +143,18 @@ class Board
     else
       self[pos].reveal_tile
     end
+
+    if self[pos].is_bomb
+      reveal_all_bombs
+    end
+
     true
+  end
+
+  def
+
+  def reveal_all_bombs
+    # build out
   end
 
 end
@@ -153,4 +173,12 @@ class Game
       pos = gets.chomp.split(',')
     end
   end
+
+  def play
+    # ask for position get_player_choice
+    # check if player lost - check if any bomb is revealed
+    # check if (a) all non-bombs revealed and (b) all bombs flagged
+
+  end
+
 end
