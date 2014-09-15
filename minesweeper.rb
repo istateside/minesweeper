@@ -58,6 +58,10 @@ class Tile
     end
   end
 
+  def flag_tile
+    @is_flagged = true
+  end
+
   def reveal_tile
     @revealed = true
 
@@ -151,7 +155,27 @@ class Board
     true
   end
 
-  def
+  def flag_spot(pos)
+    if self[pos].nil? || self[pos].is_flagged
+      return false
+    else
+      self[pos].flag_tile
+    end
+  end
+
+  def loss?
+    @rows.each do |row|
+       row.any? { |tile| tile.is_bomb && tile.revealed }
+    end
+  end
+
+  def won?
+    @rows.all? do |row|
+      row.all? do |tile|
+        tile.is_bomb ? next : tile.revealed
+      end
+    end
+  end
 
   def reveal_all_bombs
     # build out
@@ -166,19 +190,52 @@ class Game
   end
 
   def get_player_choice
+
+    # puts "Enter a command (f for flag, r for reveal) and a position (x,y)"
     puts "Select a position. x,y"
     pos = gets.chomp.split(',')
-    until @board.reveal_spot(pos)
-      puts "Please enter valid coordinates."
-      pos = gets.chomp.split(',')
+
+    puts "Flag (f) or reveal (r)?"
+    command = gets.chomp.downcase
+
+    until ['f','r'].include?(command)
+      if command == 'r'
+        until @board.reveal_spot(pos)
+          puts "Please enter valid coordinates."
+          pos = gets.chomp.split(',')
+        end
+      elsif command == 'f'
+        until @board.flag_spot(pos)
+          puts "Please enter valid coordinates."
+        end
+      else
+        puts "Please enter valid command."
+        command = gets.chomp.downcase
+      end
     end
   end
 
   def play
-    # ask for position get_player_choice
-    # check if player lost - check if any bomb is revealed
-    # check if (a) all non-bombs revealed and (b) all bombs flagged
+    loop do
+      # until the game is won
+      # check if player lost - check if any bomb is revealed
+      @board.display
 
+      get_player_choice
+
+      # check if (a) all non-bombs revealed and (b) all bombs flagged
+      if @board.loss?
+        puts "YOU LOSE."
+        break
+      elsif @board.won?
+        puts "You win!"
+        break
+      end
+
+    end
   end
+    #
+  # def over?
+  # end
 
 end
